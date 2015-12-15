@@ -78,12 +78,13 @@ isotope_init <- list(list(dN_base = 7.03, dC = c(-23.5, -19.0,  -24.0),
 #mod <- stan_model(file = 'isotope6.stan')
 mod.CM <- stan_model(file = 'isotope7.stan')
 # Run MCMC
-warmup <- 1e4
-iter <- 1e5
-thin <- 90
+warmup <- 1e5
+iter <- 1e6
+thin <- 900
 cat((iter-warmup)/thin, "samples will be saved\n")
 fit_CM1 <- sampling(object = mod.CM, data = isotope_dat, init = isotope_init,
                 warmup = warmup, iter = iter, thin = thin, chains = 1)
+fit_CM <- fit_CM1
 
 fit <- sampling(object = mod, data = isotope_dat, init = isotope_init,
                 warmup = warmup, iter = iter, thin = thin, chains = 1)
@@ -95,7 +96,7 @@ fit_CM <- fit_CM1
 
 #print(fit_CM1)
 #write.csv(summary(fit_CM), "f.csv")
-#save(fit_CM, file = "fit_CM.RData")
+#save(fit_CM, file = "fit_CM1.RData")
 
 trace <- extract(fit_CM1)
 tau_post_in <- data.frame(tau = trace$tau)
