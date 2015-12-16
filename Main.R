@@ -41,7 +41,7 @@ dH_w_g <- aggregate(dH_w, by = list(grp), FUN = mean)[2]
 dH_w_g <- as.numeric(dH_w_g[1:J, 1])
 
 
-#load("fit_CM.RData")
+#load("fit_CM1.RData")
 
 # =====================================================================#
 # SIMULATION
@@ -78,11 +78,11 @@ isotope_init <- list(list(dN_base = 7.03, dC = c(-23.5, -19.0,  -24.0),
 #mod <- stan_model(file = 'isotope6.stan')
 mod.CM <- stan_model(file = 'isotope7.stan')
 # Run MCMC
-warmup <- 1e5
-iter <- 1e6
-thin <- 900
+warmup <- 1e4
+iter <- 1e5
+thin <- 90
 cat((iter-warmup)/thin, "samples will be saved\n")
-fit_CM1 <- sampling(object = mod.CM, data = isotope_dat, init = isotope_init,
+fit_CM2 <- sampling(object = mod.CM, data = isotope_dat, init = isotope_init,
                 warmup = warmup, iter = iter, thin = thin, chains = 1)
 fit_CM <- fit_CM1
 
@@ -98,7 +98,7 @@ fit_CM <- fit_CM1
 #write.csv(summary(fit_CM), "f.csv")
 #save(fit_CM, file = "fit_CM1.RData")
 
-trace <- extract(fit_CM1)
+trace <- extract(fit_CM2)
 tau_post_in <- data.frame(tau = trace$tau)
 tau_post <- melt(data.frame(Sample = 1:nrow(tau_post_in), tau_post_in), id.vars = "Sample")
 head(tau_post)
@@ -107,7 +107,7 @@ tau_postsd <- as.vector(by(tau_post[, "value"], tau_post$variable, sd))
 tau_postm <- as.matrix(cbind(mean = round(tau_postmean,1), sd = round(tau_postsd,2)))
 tau_postm
 
-trace <- extract(fit_CM1)
+trace <- extract(fit_CM2)
 phi_post_in <- data.frame(phi = trace$phi)
 phi_post <- melt(data.frame(Sample = 1:nrow(phi_post_in), phi_post_in), id.vars = "Sample")
 head(phi_post)
