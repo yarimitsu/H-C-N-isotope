@@ -134,9 +134,9 @@ plot(p)
 dev.off()
 
 post$Labs <- NA
-post$Labs[post$variable %in%  paste0("dC.", 1)] <- "Offshore Carbon"
-post$Labs[post$variable %in%  paste0("dC.", 2)] <- "Coastal Carbon"
-post$Labs[post$variable %in%  paste0("dC.", 3)] <- "Freshwater Carbon"
+post$Labs[post$variable %in%  "dC1"] <- "Offshore Carbon"
+post$Labs[post$variable %in%  "dC2"] <- "Coastal Carbon"
+post$Labs[post$variable %in%  "dC3"] <- "Freshwater Carbon"
 post$Labs[post$variable %in%  paste0("dH.", 1)] <- "Offshore Hydrogen"
 post$Labs[post$variable %in%  paste0("dH.", 2)] <- "Coastal Hydrogen"
 post$Labs[post$variable %in%  paste0("dH.", 3)] <- "Freshwater Hydrogen"
@@ -158,11 +158,11 @@ post$Labs[post$variable %in% paste0("tau.",i)] <- levels(factor(dat$Species, ord
 }
 
 for (i in 1:M) {
-#post$Labs[post$variable %in%  paste0("Delta_C.",i)] <- levels(factor(dat$Taxa, ordered = TRUE))[i]
+post$Labs[post$variable %in%  paste0("Delta_C.",i)] <- levels(factor(dat$Taxa, ordered = TRUE))[i]
 post$Labs[post$variable %in%  paste0("Delta_N.",i)] <- levels(factor(dat$Taxa, ordered = TRUE))[i]
 }
 
-post$Labs[post$variable %in%  "Delta_C"] <- "Delta C"
+#post$Labs[post$variable %in%  "Delta_C"] <- "Delta C"
 
 post$Labs[post$variable %in%  "Delta_H"] <- "Delta H"
 
@@ -257,18 +257,18 @@ pri <- c(function(x){ dnorm(x, -24.2, 0.8) },      # dC.1 marine
          function(x){ dnorm(x, 2.2, 1.1) },      # Delta_N
          function(x){ dnorm(x, -163.7, 27.0) },   # Delta_H
          function(x){ dunif(x, 30, 150) },         # fblki
-         #function(x){ dnorm(x, blki_omega, 0.02) },# omega BLKI 
-         function(x){ dunif(x, 0.18, 0.50) }, 
+         function(x){ dnorm(x, blki_omega, 0.02) },# omega BLKI 
+         #function(x){ dunif(x, 0.18, 0.50) }, 
          function(x){ dnorm(x, 0.23, 0.03) },      # omega Bulk zoop
          function(x){ dnorm(x, 0.33, 0.1) },       # omega capelin
          function(x){ dnorm(x, 0.23, 0.03) },      # omega copepod
          function(x){ dnorm(x, 0.23, 0.03) },      # omega epacifica
          function(x){ dnorm(x, 0.33, 0.1) },       # omega eulachon
          function(x){ dnorm(x, 0.33, 0.1) },       # omega herring
-         #function(x){ dnorm(x, kimu_omega, 0.02) },    # omega KIMU
-         #function(x){ dnorm(x, mamu_omega, 0.02) },   # omega MAMU
-         function(x){ dunif(x, 0.18, 0.50) }, 
-         function(x){ dunif(x, 0.18, 0.50) }, 
+         function(x){ dnorm(x, kimu_omega, 0.02) },    # omega KIMU
+         function(x){ dnorm(x, mamu_omega, 0.02) },   # omega MAMU
+         #function(x){ dunif(x, 0.18, 0.50) }, 
+         #function(x){ dunif(x, 0.18, 0.50) }, 
          function(x){ dnorm(x, 0.23, 0.03) },  # omega neomysis
          function(x){ dnorm(x, 0.33, 0.1) },   # omega pollock
          function(x){ dnorm(x, 0.33, 0.1) },   # omega sandlance
@@ -350,9 +350,9 @@ head(d1)
 k <- grepl("dC", post$variable) | grepl("dN", post$variable) | grepl("dH", post$variable) | grepl("sigma_src", dp$variable)
 dp2 <- dp[k,]
 dp2$Labs <- NA
-dp2$Labs[dp2$variable %in%  paste0("dC.", 1)] <- "Offshore Carbon"
-dp2$Labs[dp2$variable %in%  paste0("dC.", 2)] <- "Coastal Carbon"
-dp2$Labs[dp2$variable %in%  paste0("dC.", 3)] <- "Freshwater Carbon"
+dp2$Labs[dp2$variable %in%  "dC1"] <- "Offshore Carbon"
+dp2$Labs[dp2$variable %in%  "dC2"] <- "Coastal Carbon"
+dp2$Labs[dp2$variable %in%  "dC3"] <- "Freshwater Carbon"
 dp2$Labs[dp2$variable %in%  paste0("dH.", 1)] <- "Offshore Hydrogen"
 dp2$Labs[dp2$variable %in%  paste0("dH.", 2)] <- "Coastal Hydrogen"
 dp2$Labs[dp2$variable %in%  paste0("dH.", 3)] <- "Freshwater Hydrogen"
@@ -389,9 +389,9 @@ j <- grepl("dC", dp$variable) | grepl("dN", dp$variable) | grepl("dH", dp$variab
 dp1 <- dp[i,]
 head(dp1)
 dp1$Labs <- NA
-dp1$Labs[dp1$variable %in%  paste0("dC.", 1)] <- "Offshore Carbon"
-dp1$Labs[dp1$variable %in%  paste0("dC.", 2)] <- "Coastal Carbon"
-dp1$Labs[dp1$variable %in%  paste0("dC.", 3)] <- "Freshwater Carbon"
+dp1$Labs[dp1$variable %in%  "dC1"] <- "Offshore Carbon"
+dp1$Labs[dp1$variable %in%  "dC2"] <- "Coastal Carbon"
+dp1$Labs[dp1$variable %in%  "dC3"] <- "Freshwater Carbon"
 dp1$Labs[dp1$variable %in%  paste0("dH.", 1)] <- "Offshore Hydrogen"
 dp1$Labs[dp1$variable %in%  paste0("dH.", 2)] <- "Coastal Hydrogen"
 dp1$Labs[dp1$variable %in%  paste0("dH.", 3)] <- "Freshwater Hydrogen"
@@ -410,11 +410,14 @@ dev.off()
 i <- grepl("Delta_C", post$variable)
 d1 <- post[i,]
 p <- ggplot(d1, aes(value)) +
-  #facet_wrap(~Labs, scales = "free", ncol = 3) +
+  facet_wrap(~Labs, scales = "free", ncol = 3) +
   geom_histogram(aes(y = ..density..)) + ylab("Probability Density\n") + xlab(expression(paste("\nDelta C (\u2030)")))
 j <- grepl("Delta_C", dp$variable)
 dp1 <- dp[i,]
 head(dp1)
+for (i in 1:M){
+  dp1$Labs[dp1$variable %in%  paste0("Delta_C.", i)] <- levels(factor(dat$Taxa, ordered = TRUE))[i]
+}
 p <- p + geom_line(data = dp1, aes(x = x, y = value1), color = "red")
 png("figs/mcmc_par_hist_DeltaC.png", width = 8, height = 6, units = "in", res = 300)
 plot(p)
