@@ -15,16 +15,16 @@ data {
 }
 
 parameters {
-  real dN_base;                    // 15N of primary consumers
-  real dC1;                      // 13C marine, coastal and freshwater sources
-  real dC2;                      // 13C marine, coastal and freshwater sources
-  real <upper = -22> dC3;        // 13C marine, coastal and freshwater sources
-  real dN[K];                      // 15N marine, coastal and freshwater sources
-  real dH[K];                      // 2H marine, coastal and freshwater sources
-  simplex[K] phi[J];               // phi is defined as a unit simplex and thus sum(phi)=1
-  real <upper = 1> Delta_C[M];                 // trophic fractionation of C
-  real Delta_N[M];                 // trophic fractionation of N
-  real Delta_H;                    // trophic fractionation of H
+  real dN_base;                        // 15N of primary consumers
+  real dC1;                            // 13C marine source
+  real dC2;                            // 13C coastal source
+  real <upper = -22> dC3;              // 13C freshwater source
+  real dN[K];                          // 15N marine, coastal and freshwater sources
+  real dH[K];                          // 2H marine, coastal and freshwater sources
+  simplex[K] phi[J];                   // phi is defined as a unit simplex and thus sum(phi)=1
+  real <upper = 2> Delta_C[M];         // trophic fractionation of C
+  real Delta_N[M];                     // trophic fractionation of N
+  real Delta_H;                        // trophic fractionation of H
   real<lower=0, upper = 0.6> omega[J]; // proportion of 2H due to ambient water dH_w
   real<lower=0> fblki;             // blki fractionation
   real<lower=0> sigma_src[3,K];    // sigma source parameters marine, coastal, freshwater for dC, dH, dN 
@@ -43,7 +43,7 @@ transformed parameters {
   real sigma_C[J];
   real sigma_N[J];
   real sigma_H[J];
-  real <lower = 2, upper = 5> tau[J];
+  real <lower = 1.8, upper = 5> tau[J];
 
   for (j in 1:J) {
     tau[j] <- 2 + (dN_g[j] - dN_base)/Delta_N[tx[j]];

@@ -523,8 +523,8 @@ labH <- expression(paste(delta^{2}, "H (\u2030)"))
 
 gpost$Species <- factor(gpost$Species, levels = c("Bulk Zoop", "Copepod", "E. pacifica", "Thysanoessa", "T. libellula", "Neomysis", "YOY Capelin", "YOY Herring", "YOY Pollock", "Eulachon", "Capelin", "Herring", "Sandlance", "Pollock", "KIMU", "MAMU", "BLKI"))
 dat$Taxa <- factor(dat$Taxa, levels = c("bird liver", "bird blood", "fish", "YOY fish", "macroz","microz"))
+#dat$Species <- factor(dat$Species, levels = c("Bulk Zoop", "Copepod", "E. pacifica", "Thysanoessa", "T. libellula", "Neomysis", "YOY Capelin", "YOY Herring", "YOY Pollock", "Eulachon", "Capelin", "Herring", "Sandlance", "Pollock", "KIMU", "MAMU", "BLKI"))
 dat$Species <- factor(dat$Species, levels = c("Bulk Zoop", "Copepod", "E. pacifica", "Thysanoessa", "T. libellula", "Neomysis", "YOY Capelin", "YOY Herring", "YOY Pollock", "Eulachon", "Capelin", "Herring", "Sandlance", "Pollock", "KIMU", "MAMU", "BLKI"))
-
 
 library(scales)
 integer_breaks <- function(n = 5, ...) {

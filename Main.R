@@ -41,16 +41,7 @@ dH_w_g <- aggregate(dH_w, by = list(grp), FUN = mean)[2]
 dH_w_g <- as.numeric(dH_w_g[1:J, 1])
 
 
-#load("fit_CM1.RData")
-
-# =====================================================================#
-# SIMULATION
-# =====================================================================#
-# Initial.Values <- c(-23.7, -24.9, -19.1, -7.1, -113, -15, 1.626544, -14.256495, 7.616156, 2.044173, 1.728355, -8.700835, -6.765336, 7.443521, -6.809056, -6.449024, -5.089111, -1.374354, 0.875469, 5.106157)
-# Sim <- Model_Sim(Initial.Values, N, seed = 42)
-# dH_sim <- dH_obs <- Sim$dH_sim; dH_sim
-# dC_sim <- dC_obs <- Sim$dC_sim; dC_sim
-
+#load("fit.RData")
 
 # =====================================================================#
 # STAN MODEL (MCMC)
@@ -75,39 +66,31 @@ isotope_init <- list(list(dN_base = 7.03, dC = c(-23.5, -19.0,  -24.0),
 
 
 # STAN model
-#mod <- stan_model(file = 'isotope6.stan')
-mod.CM <- stan_model(file = 'isotope7.stan')
+mod <- stan_model(file = 'isotope7.stan')
 # Run MCMC
 warmup <- 1e4
 iter <- 1e5
 thin <- 90
 cat((iter-warmup)/thin, "samples will be saved\n")
-fit_CM2 <- sampling(object = mod.CM, data = isotope_dat, init = isotope_init,
-                warmup = warmup, iter = iter, thin = thin, chains = 1)
-fit_CM <- fit_CM1
-
 fit <- sampling(object = mod, data = isotope_dat, init = isotope_init,
                 warmup = warmup, iter = iter, thin = thin, chains = 1)
 
 # Plot model fit
 source("Plot.R")
 
-fit_CM <- fit_CM1
+#print(fit)
+#write.csv(summary(fit), "f.csv")
+#save(fit, file = "fit.RData")
 
-#print(fit_CM1)
-#write.csv(summary(fit_CM), "f.csv")
-#save(fit_CM, file = "fit_CM1.RData")
-
-trace <- extract(fit_CM2)
+trace <- extract(fit)
 tau_post_in <- data.frame(tau = trace$tau)
 tau_post <- melt(data.frame(Sample = 1:nrow(tau_post_in), tau_post_in), id.vars = "Sample")
 head(tau_post)
 tau_postmean <- as.vector(by(tau_post[, "value"], tau_post$variable, mean))
 tau_postsd <- as.vector(by(tau_post[, "value"], tau_post$variable, sd))
-tau_postm <- as.matrix(cbind(mean = round(tau_postmean,1), sd = round(tau_postsd,2)))
+tau_postm <- as.matrix(cbind(Species = levels(dat$Species), mean = round(tau_postmean,1), sd = round(tau_postsd,2)))
 tau_postm
 
-trace <- extract(fit_CM2)
 phi_post_in <- data.frame(phi = trace$phi)
 phi_post <- melt(data.frame(Sample = 1:nrow(phi_post_in), phi_post_in), id.vars = "Sample")
 head(phi_post)
@@ -115,4 +98,3 @@ phi_postmedian <- as.vector(by(phi_post[, "value"], phi_post$variable, median))
 phi_postsd <- as.vector(by(phi_post[, "value"], phi_post$variable, sd))
 phi_postm <- as.matrix(cbind(Species = rep(levels(dat$Species)), ID = levels(phi_post$variable), median = round(phi_postmedian,2), sd = round(phi_postsd,2)))
 phi_postm
-phi_
