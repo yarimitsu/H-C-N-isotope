@@ -2,7 +2,7 @@
 #=============================================================================#
 # Extract posteriors from the STAN MCMC
 #=============================================================================#
-trace <- extract(fit_CM)
+trace <- extract(fit)
 names(trace)
 post_in <- data.frame(dC1 = trace$dC1, dC2 = trace$dC2,dC3 = trace$dC3,dN = trace$dN, dH = trace$dH,
                       Delta_C = trace$Delta_C, Delta_N = trace$Delta_N, Delta_H = trace$Delta_H,frac_H_blki = trace$fblki,
@@ -30,7 +30,7 @@ for (i in 1:J)
 }
 
 # posteriors for dC_exp, dN_exp, and dH_exp
-m <- as.matrix(fit_CM)
+m <- as.matrix(fit)
 head(m)
 gpost <- NULL
 for (j in 1:J)
