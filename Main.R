@@ -9,10 +9,6 @@ library(ggplot2)
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
-# R code
-# source("Simulator.R")
-# source("Model.R")
-
 # =====================================================================#
 # DATA
 # =====================================================================#
@@ -41,8 +37,8 @@ dH_w_g <- aggregate(dH_w, by = list(grp), FUN = mean)[2]
 dH_w_g <- as.numeric(dH_w_g[1:J, 1])
 
 
-#load("fit.RData")
-
+#load("fit_CM.RData")
+#fit <- fit_CM
 # =====================================================================#
 # STAN MODEL (MCMC)
 # =====================================================================#
@@ -52,7 +48,7 @@ isotope_dat <- list(N = N, J = J, K = K, M = M, grp = grp,
                     dN_g = dN_g, dC_g = dC_g, dH_w = dH_w_g, tx = tx)
 
 
-isotope_init <- list(list(dN_base = 7.03, dC = c(-23.5, -19.0,  -24.0),
+isotope_init <- list(list(dN_base = 7.03, dC1 = -23.5, dC2 = -19.0,  dC3 = -24.0,
                           dN = c(  3.6,   3.2,    3.5),
                           dH = c( -7.1, -15.0, -115.0),
                           phi = matrix(c(0.2,0.6,0.2), J, K),
@@ -68,9 +64,9 @@ isotope_init <- list(list(dN_base = 7.03, dC = c(-23.5, -19.0,  -24.0),
 # STAN model
 mod <- stan_model(file = 'isotope7.stan')
 # Run MCMC
-warmup <- 1e4
-iter <- 1e5
-thin <- 90
+warmup <- 1e5
+iter <- 1e6
+thin <- 900
 cat((iter-warmup)/thin, "samples will be saved\n")
 fit <- sampling(object = mod, data = isotope_dat, init = isotope_init,
                 warmup = warmup, iter = iter, thin = thin, chains = 1)
