@@ -16,9 +16,10 @@ data {
 
 parameters {
   real dN_base;                        // 15N of primary consumers
-  real dC1;                            // 13C marine source
-  real dC2;                            // 13C coastal source
-  real <upper = -22> dC3;              // 13C freshwater source
+  ordered[3] dC_ord;
+  //real dC1;                            // 13C marine source
+  //real dC2;                            // 13C coastal source
+  //real <upper = -22> dC3;              // 13C freshwater source
   real dN[K];                          // 15N marine, coastal and freshwater sources
   real dH[K];                          // 2H marine, coastal and freshwater sources
   simplex[K] phi[J];                   // phi is defined as a unit simplex and thus sum(phi)=1
@@ -44,7 +45,14 @@ transformed parameters {
   real sigma_N[J];
   real sigma_H[J];
   real <lower = 1.8, upper = 5> tau[J];
+  real dC1;                            // 13C marine source
+  real dC2;                            // 13C coastal source
+  real dC3;              // 13C freshwater source
 
+  dC1 <- dC_ord[2];
+  dC2 <- dC_ord[3];
+  dC3 <- dC_ord[1];
+  
   for (j in 1:J) {
     tau[j] <- 2 + (dN_g[j] - dN_base)/Delta_N[tx[j]];
     C_tot[j]  <- Delta_C[tx[j]] * (tau[j]-1);
