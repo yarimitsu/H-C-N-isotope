@@ -1,7 +1,9 @@
+dat$Species <- factor(dat$Species, levels = c("BLKI","Bulk Zoop", "Capelin", "Copepod", "E. pacifica",  "Eulachon",  "Herring", "KIMU", "MAMU", "Neomysis", "Pollock", "Sandlance", "T. libellula", "Thysanoessa", "YOY Capelin", "YOY Herring", "YOY Pollock"))
 
 #=============================================================================#
 # Extract posteriors from the STAN MCMC
 #=============================================================================#
+# fit <- fit_sim
 trace <- extract(fit)
 names(trace)
 post_in <- data.frame(dC1 = trace$dC1, dC2 = trace$dC2,dC3 = trace$dC3,dN = trace$dN, dH = trace$dH,
