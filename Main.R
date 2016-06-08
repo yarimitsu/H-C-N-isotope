@@ -64,9 +64,9 @@ isotope_init <- list(list(dN_base = 7.03, dC1 = -23.5, dC2 = -19.0,  dC3 = -24.0
 # STAN model
 mod <- stan_model(file = 'isotope7.stan')
 # Run MCMC
-warmup <- 1e3
+warmup <- 1e4
 iter <- 1e5
-thin <- 50
+thin <- 90
 cat((iter-warmup)/thin, "samples will be saved\n")
 fit <- sampling(object = mod, data = isotope_dat, init = isotope_init,
                 warmup = warmup, iter = iter, thin = thin, chains = 1)
