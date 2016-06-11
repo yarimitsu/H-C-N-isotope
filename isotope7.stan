@@ -185,23 +185,23 @@ model {
   //omega[16] ~ normal(0.33, 0.1);
   //omega[17] ~ normal(0.33, 0.1);
 
-  omega[1] ~ normal(1-pow((1-0.23), tau[1]-1), 1);
-  omega[2] ~ normal(0.23, 1);
-  omega[3] ~ normal(0.33, 1);
-  omega[4] ~ normal(0.23, 1);
-  omega[5] ~ normal(0.23, 1);
-  omega[6] ~ normal(0.33, 1);
-  omega[7] ~ normal(0.33, 1);
-  omega[8] ~ normal(1-pow((1-0.23), tau[8]-1), 1);
-  omega[9] ~ normal(1-pow((1-0.23), tau[9]-1), 1);
-  omega[10] ~ normal(0.23, 1);
-  omega[11] ~ normal(0.33, 1);
-  omega[12] ~ normal(0.33, 1);
-  omega[13] ~ normal(0.23, 1);
-  omega[14] ~ normal(0.23, 1);
-  omega[15] ~ normal(0.33, 1);
-  omega[16] ~ normal(0.33, 1);
-  omega[17] ~ normal(0.33, 1);
+  omega[1] ~ normal(1-pow((1-0.23), tau[1]-1), .1);
+  omega[2] ~ normal(0.23, .1);
+  omega[3] ~ normal(0.33, .1);
+  omega[4] ~ normal(0.23, .1);
+  omega[5] ~ normal(0.23, .1);
+  omega[6] ~ normal(0.33, .1);
+  omega[7] ~ normal(0.33, .1);
+  omega[8] ~ normal(1-pow((1-0.23), tau[8]-1), .1);
+  omega[9] ~ normal(1-pow((1-0.23), tau[9]-1), .1);
+  omega[10] ~ normal(0.23, .1);
+  omega[11] ~ normal(0.33, .1);
+  omega[12] ~ normal(0.33, .1);
+  omega[13] ~ normal(0.23, .1);
+  omega[14] ~ normal(0.23, .1);
+  omega[15] ~ normal(0.33, .1);
+  omega[16] ~ normal(0.33, .1);
+  omega[17] ~ normal(0.33, .1);
 
   for (j in 1:J) {
     sigma_frc[1,j] ~ uniform(0.0,10000);
