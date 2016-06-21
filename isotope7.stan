@@ -51,19 +51,19 @@ transformed data{
 }
 parameters {
   real dN_base;                        // 15N of primary consumers
-  ordered[3] dC_ord;
-  //real dC1;                            // 13C marine source
-  //real dC2;                            // 13C coastal source
-  //real <upper = -22> dC3;              // 13C freshwater source
+  ordered[3] dC_ord;                   //carbon sources are ordered vector
+  //real dC1;                          // 13C marine source
+  //real dC2;                          // 13C coastal source
+  //real dC3;                          // 13C freshwater source
   real dN[K];                          // 15N marine, coastal and freshwater sources
   real dH[K];                          // 2H marine, coastal and freshwater sources
   simplex[K] phi[J];                   // phi is defined as a unit simplex and thus sum(phi)=1
-  real Delta_C[M];         // trophic fractionation of C
+  real<lower=0, upper = 1> Delta_C[M]; // trophic fractionation of C
   real Delta_N[M];                     // trophic fractionation of N
   real Delta_H;                        // trophic fractionation of H
-  real<lower=0, upper = 0.8> omega[J]; // proportion of 2H due to ambient water dH_w
-  real<lower=0> fblki;             // blki fractionation
-  real<lower=0> sigma_src[3,K];    // sigma source parameters marine, coastal, freshwater for dC, dH, dN 
+  real<lower=0, upper = 0.6> omega[J]; // proportion of 2H due to ambient water dH_w
+  real<lower=0> fblki;                 // blki fractionation
+  real<lower=0> sigma_src[3,K];        // sigma source parameters marine, coastal, freshwater for dC, dH, dN 
   real<lower=0> sigma_frc[2,J];    // sigma C_tot, N_tot
   real<lower=0> sigma_frcH;        // sigma Delta_H
   real<lower=0> sigma_omega[J];    // sigma omega
@@ -142,17 +142,17 @@ model {
 
   // Priors
   dN_base ~ normal(7.03, 1.38);   // copepod 15N, measured
-  dC1 ~ normal(-24.2, 0.8);     // Offshore marine, <100m Bulk POM (Wu et al 1999)
-  dC2 ~ normal(-19.1, 1.2);     // Coastal, measured
-  dC3 ~ normal(-26.4, 1.47);    // Freshwater POM (Geary 1988 p 80)
+  dC1 ~ normal(-22.8, 2.2);       // Offshore marine, copepod n = 426, Kline 2010
+  dC2 ~ normal(-19.1, 1.2);       // Coastal, measured
+  dC3 ~ normal(-26.4, 1.47);      // Freshwater POM (Geary 1988 p 80)
   dN[1] ~ normal(3.6, 0.2);       // offshore marine SPOM (Wu et al 1997, p 298)
   dN[2] ~ normal(3.1, 0.6);       // coastal, measured POM
   dN[3] ~ normal(4.4, 3.9);       // freshwater, measured POM 
   dH[1] ~ normal(-7.4, 1.0);      // Marine, measured
   dH[2] ~ normal(-15, 20);        // coastal, measured
   dH[3] ~ normal(-113.0, 10.9);   // freshwater, measured
-  Delta_C[M] ~ normal(0.4, 1.3);     // 13C fractionation per trophic level (Post 2002)
-  //Delta_C[M] ~ uniform(0, 1);
+  //Delta_C[M] ~ normal(0.4, 1.3);     // 13C fractionation per trophic level (Post 2002)
+  Delta_C[M] ~ uniform(0, 1);
   Delta_N[1] ~ normal(3.0, 0.9);  //bird.liver
   Delta_N[2] ~ normal(2.2, 0.7);  //bird.blood
   Delta_N[3] ~ normal(3.2, 1.9);  //fish
