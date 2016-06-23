@@ -18,7 +18,7 @@ transformed data{
   vector[J] n_g;
   vector[J] n_w;
   vector[J] dN_g;   // data: mean 15N of each group
-  vector[J] dH_w; // covariate: 2H of water
+  vector[J] dH_w;   // covariate: 2H of water
   
   for(i in 1:J) {
     n_g[i] <- 0.0;
@@ -61,7 +61,7 @@ parameters {
   real<lower=0, upper = 1> Delta_C[M]; // trophic fractionation of C
   real Delta_N[M];                     // trophic fractionation of N
   real Delta_H;                        // trophic fractionation of H
-  real<lower=0, upper = 0.6> omega[J]; // proportion of 2H due to ambient water dH_w
+  real<lower=0, upper = 0.7> omega[J]; // proportion of 2H due to ambient water dH_w
   real<lower=0> fblki;                 // blki fractionation
   real<lower=0> sigma_src[3,K];        // sigma source parameters marine, coastal, freshwater for dC, dH, dN 
   real<lower=0> sigma_frc[2,J];    // sigma C_tot, N_tot
@@ -142,10 +142,12 @@ model {
 
   // Priors
   dN_base ~ normal(7.03, 1.38);   // copepod 15N, measured
-  dC1 ~ normal(-22.8, 2.2);       // Offshore marine, copepod n = 426, Kline 2010
+  //dC1 ~ normal(-22.8, 2.2);       // Offshore marine, copepod n = 426, Kline 2010
+  dC1 ~ normal(-23.5, 0.8);       // Offshore marine, surface sediment 7 sites GOA, Walinski et al 2009
   dC2 ~ normal(-19.1, 1.2);       // Coastal, measured
   dC3 ~ normal(-26.4, 1.47);      // Freshwater POM (Geary 1988 p 80)
-  dN[1] ~ normal(3.6, 0.2);       // offshore marine SPOM (Wu et al 1997, p 298)
+  //dN[1] ~ normal(3.6, 0.2);       // offshore marine SPOM (Wu et al 1997, p 298)
+  dN[1] ~ normal(3.6, 0.7);       // offshore marine surface sediment GOA Walinski et al 2009
   dN[2] ~ normal(3.1, 0.6);       // coastal, measured POM
   dN[3] ~ normal(4.4, 3.9);       // freshwater, measured POM 
   dH[1] ~ normal(-7.4, 1.0);      // Marine, measured
@@ -185,20 +187,20 @@ model {
   //omega[16] ~ normal(0.33, 0.1);
   //omega[17] ~ normal(0.33, 0.1);
 
-  omega[1] ~ normal(1-pow((1-0.23), tau[1]-1), .1);
-  omega[2] ~ normal(0.23, .1);
+  omega[1] ~ normal(1-pow((1-0.23), tau[1]-1), .05);
+  omega[2] ~ normal(0.23, .03);
   omega[3] ~ normal(0.33, .1);
-  omega[4] ~ normal(0.23, .1);
-  omega[5] ~ normal(0.23, .1);
+  omega[4] ~ normal(0.23, .03);
+  omega[5] ~ normal(0.23, .03);
   omega[6] ~ normal(0.33, .1);
   omega[7] ~ normal(0.33, .1);
-  omega[8] ~ normal(1-pow((1-0.23), tau[8]-1), .1);
-  omega[9] ~ normal(1-pow((1-0.23), tau[9]-1), .1);
-  omega[10] ~ normal(0.23, .1);
+  omega[8] ~ normal(1-pow((1-0.23), tau[8]-1), .05);
+  omega[9] ~ normal(1-pow((1-0.23), tau[9]-1), .05);
+  omega[10] ~ normal(0.23, .03);
   omega[11] ~ normal(0.33, .1);
   omega[12] ~ normal(0.33, .1);
-  omega[13] ~ normal(0.23, .1);
-  omega[14] ~ normal(0.23, .1);
+  omega[13] ~ normal(0.23, .03);
+  omega[14] ~ normal(0.23, .03);
   omega[15] ~ normal(0.33, .1);
   omega[16] ~ normal(0.33, .1);
   omega[17] ~ normal(0.33, .1);

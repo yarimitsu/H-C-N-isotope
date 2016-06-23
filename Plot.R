@@ -240,16 +240,17 @@ head(dp)
 blki_omega <- 1-(1-0.23)^(mean(xx[, "tau.1"])-1)
 kimu_omega <- 1-(1-0.23)^(mean(xx[, "tau.8"])-1)
 mamu_omega <- 1-(1-0.23)^(mean(xx[, "tau.9"])-1)
-pri <- c(function(x){ dnorm(x, -24.2, 0.8) },      # dC.1 marine
+pri <- c(function(x){ dnorm(x, -23.5, 0.8) },      # dC.1 marine
          function(x){ dnorm(x, -19.1, 1.2) },      # dC.2 coastal
          function(x){ dnorm(x, -26.4, 1.47) },     # dC.3 freshwater
-         function(x){ dnorm(x, 3.6, 0.2) },        # dN.1 marine
+         function(x){ dnorm(x, 3.6, 0.8) },        # dN.1 marine
          function(x){ dnorm(x, 3.1, 0.6) },        # dN.2 coastal
          function(x){ dnorm(x, 4.4, 3.9) },        # dN.3 freshwater
          function(x){ dnorm(x, -7.4, 1.0) },       # dH.1 marine
          function(x){ dnorm(x, -15.3, 3.6) },      # dH.2 coastal
          function(x){ dnorm(x, -113.0, 10.9) },    # dH.3 freshwater
-         replicate(M, function(x){ dnorm(x, 0.4, 1.3) }),  # Delta_C
+#          replicate(M, function(x){ dnorm(x, 0.4, 1.3) }),  # Delta_C
+         replicate(M, function(x){ dunif(x, 0, 1) }),  # Delta_C
          #function(x){ dnorm(x, 0.4, 1.3) },      # Delta_C
          function(x){ dnorm(x, 3.0, 0.9) },      # Delta_N   
          function(x){ dnorm(x, 2.2, 0.7) },      # Delta_N
@@ -259,18 +260,15 @@ pri <- c(function(x){ dnorm(x, -24.2, 0.8) },      # dC.1 marine
          function(x){ dnorm(x, 2.2, 1.1) },      # Delta_N
          function(x){ dnorm(x, -163.7, 27.0) },   # Delta_H
          function(x){ dunif(x, 30, 150) },         # fblki
-         function(x){ dnorm(x, blki_omega, 0.02) },# omega BLKI 
-         #function(x){ dunif(x, 0.18, 0.50) }, 
+         function(x){ dnorm(x, blki_omega, 0.05) },# omega BLKI 
          function(x){ dnorm(x, 0.23, 0.03) },      # omega Bulk zoop
          function(x){ dnorm(x, 0.33, 0.1) },       # omega capelin
          function(x){ dnorm(x, 0.23, 0.03) },      # omega copepod
          function(x){ dnorm(x, 0.23, 0.03) },      # omega epacifica
          function(x){ dnorm(x, 0.33, 0.1) },       # omega eulachon
          function(x){ dnorm(x, 0.33, 0.1) },       # omega herring
-         function(x){ dnorm(x, kimu_omega, 0.02) },    # omega KIMU
-         function(x){ dnorm(x, mamu_omega, 0.02) },   # omega MAMU
-         #function(x){ dunif(x, 0.18, 0.50) }, 
-         #function(x){ dunif(x, 0.18, 0.50) }, 
+         function(x){ dnorm(x, kimu_omega, 0.05) },    # omega KIMU
+         function(x){ dnorm(x, mamu_omega, 0.05) },   # omega MAMU
          function(x){ dnorm(x, 0.23, 0.03) },  # omega neomysis
          function(x){ dnorm(x, 0.33, 0.1) },   # omega pollock
          function(x){ dnorm(x, 0.33, 0.1) },   # omega sandlance
@@ -279,6 +277,23 @@ pri <- c(function(x){ dnorm(x, -24.2, 0.8) },      # dC.1 marine
          function(x){ dnorm(x, 0.33, 0.1) },   # omega YOY capelin
          function(x){ dnorm(x, 0.33, 0.1) },   # omega YOY herring
          function(x){ dnorm(x, 0.33, 0.1) },   # omega YOY pollock
+#          function(x){ dnorm(x, blki_omega, 0.5) },# omega BLKI 
+#          function(x){ dnorm(x, 0.23, 0.5) },      # omega Bulk zoop
+#          function(x){ dnorm(x, 0.33, 0.5) },       # omega capelin
+#          function(x){ dnorm(x, 0.23, 0.5) },      # omega copepod
+#          function(x){ dnorm(x, 0.23, 0.5) },      # omega epacifica
+#          function(x){ dnorm(x, 0.33, 0.5) },       # omega eulachon
+#          function(x){ dnorm(x, 0.33, 0.5) },       # omega herring
+#          function(x){ dnorm(x, kimu_omega, 0.5) },    # omega KIMU
+#          function(x){ dnorm(x, mamu_omega, 0.5) },   # omega MAMU
+#          function(x){ dnorm(x, 0.23, 0.5) },  # omega neomysis
+#          function(x){ dnorm(x, 0.33, 0.5) },   # omega pollock
+#          function(x){ dnorm(x, 0.33, 0.5) },   # omega sandlance
+#          function(x){ dnorm(x, 0.23, 0.5) },  # omega T libellula
+#          function(x){ dnorm(x, 0.23, 0.5) },  # omega Thysanoessa
+#          function(x){ dnorm(x, 0.33, 0.5) },   # omega YOY capelin
+#          function(x){ dnorm(x, 0.33, 0.5) },   # omega YOY herring
+#          function(x){ dnorm(x, 0.33, 0.5) },   # omega YOY pollock
          replicate(J, function(x){NA}),                        # tau
          replicate(3*J, function(x){ NA }),                    # phis
          function(x){ dunif(x, 0.0, 10000)},                   # sigma_fblki
