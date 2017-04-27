@@ -28,7 +28,7 @@ transformed data{
   }
   
   for (i in 1:N) {
-    jj <- grp[i];
+   jj <- grp[i];
     n_g[jj] <- n_g[jj] + 1;
     dN_g[jj] <- dN_g[jj] + dN_obs[i];
   }
@@ -49,28 +49,27 @@ transformed data{
   print("dN_g");
   print(dN_g);
 }
+
 parameters {
-  real dN_base;                        // 15N of primary consumers
-  ordered[3] dC_ord;                   //carbon sources are ordered vector
-  //real dC1;                          // 13C marine source
-  //real dC2;                          // 13C coastal source
-  //real dC3;                          // 13C freshwater source
+// real dN_base;                       // 15N of primary consumers
+// real dN_g[J];                       // 15N of consumers by group for tau
+  ordered[3] dC_ord;                   // carbon sources are ordered vector
   real dN[K];                          // 15N marine, coastal and freshwater sources
   real dH[K];                          // 2H marine, coastal and freshwater sources
-  simplex[K] phi[J];                   // phi is defined as a unit simplex and thus sum(phi)=1
+  simplex[K] phi[J];                   // phi is defined as a unit simplex and thus are nonnegative and sum(phi)=1
   real<lower=0, upper = 1> Delta_C[M]; // trophic fractionation of C
   real Delta_N[M];                     // trophic fractionation of N
   real Delta_H;                        // trophic fractionation of H
   real<lower=0, upper = 0.7> omega[J]; // proportion of 2H due to ambient water dH_w
   real<lower=0> fblki;                 // blki fractionation
   real<lower=0> sigma_src[3,K];        // sigma source parameters marine, coastal, freshwater for dC, dH, dN 
-  real<lower=0> sigma_frc[2,J];    // sigma C_tot, N_tot
-  real<lower=0> sigma_frcH;        // sigma Delta_H
-  real<lower=0> sigma_omega[J];    // sigma omega
-  real<lower=0> sigma_fblki;       // sigma blki fractionation
-
+  real<lower=0> sigma_frc[2,J];        // sigma C_tot, N_tot
+  real<lower=0> sigma_frcH;            // sigma Delta_H
+  real<lower=0> sigma_omega[J];        // sigma omega
+  real<lower=0> sigma_fblki;           // sigma blki fractionation
 }
 transformed parameters {
+  real <lower=1.8, upper = 5.5> tau[J];//trophic level by group
   real C_tot[J];
   real N_tot[J];
   real dC_exp[J];
@@ -79,17 +78,29 @@ transformed parameters {
   real sigma_C[J];
   real sigma_N[J];
   real sigma_H[J];
-  real <lower = 1.8, upper = 5> tau[J];
   real dC1;                            // 13C marine source
   real dC2;                            // 13C coastal source
-  real dC3;              // 13C freshwater source
+  real dC3;                            // 13C freshwater source
 
   dC1 <- dC_ord[2];
   dC2 <- dC_ord[3];
   dC3 <- dC_ord[1];
   
   for (j in 1:J) {
-    tau[j] <- 2 + (dN_g[j] - dN_base)/Delta_N[tx[j]];
+   tau[j] <- phi[j][1]*(dN_g[j] - dN[1])/Delta_N[tx[j]] +
+             phi[j][2]*(dN_g[j] - dN[2])/Delta_N[tx[j]] + 
+             phi[j][3]*(dN_g[j] - dN[3])/Delta_N[tx[j]] + 1;
+  }
+  
+//  for (i in 1:N) {
+//  jj <- grp[i]
+//   tau_ind[i] <- phi[jj][1]*(dN_obs[i] - dN[1])/Delta_N[tx[jj]] +
+//             phi[jj][2]*(dN_obs[i] - dN[2])/Delta_N[tx[jj]] + 
+//             phi[jj][3]*(dN_obs[i] - dN[3])/Delta_N[tx[jj]] + 1;
+//  }
+  
+  
+  for (j in 1:J) {
     C_tot[j]  <- Delta_C[tx[j]] * (tau[j]-1);
     N_tot[j]  <- Delta_N[tx[j]] * (tau[j]-1); 
     dC_exp[j] <- (phi[j][1] * (dC1 + C_tot[j])) + 
@@ -98,8 +109,7 @@ transformed parameters {
     dN_exp[j] <- (phi[j][1] * (dN[1] + N_tot[j])) + 
                  (phi[j][2] * (dN[2] + N_tot[j])) + 
                  (phi[j][3] * (dN[3] + N_tot[j]));
-   }
-
+  }
 
   dH_exp[1] <-   (omega[1] * dH_w[1]) + ((1 - omega[1]) * (
                  (phi[1][1] * (dH[1] + Delta_H)) + 
@@ -140,21 +150,57 @@ model {
   real eps_H;
   real eps_N;
 
-  // Priors
-  dN_base ~ normal(7.03, 1.38);   // copepod 15N, measured
-  //dC1 ~ normal(-22.8, 2.2);       // Offshore marine, copepod n = 426, Kline 2010
+// Priors
+//  dN_base ~ normal(7.03, 1.38);   // copepod 15N, measured
+//  dN_g[1] ~ normal(15.91, 0.53);  // d15N BLKI
+//  dN_g[2] ~ normal(7.55, 1.22);   // d15N  Bulk Zoop
+//  dN_g[3] ~ normal(13.23, 0.41);  // d15N  Capelin
+//  dN_g[4] ~ normal(7.03, 01.38);  // d15N  Copepod
+//  dN_g[5] ~ normal(11.07, 1.21);  // d15N  Euphausia
+//  dN_g[6] ~ normal(14.75, 0.37);  // d15N  Eulachon
+//  dN_g[7] ~ normal(13.44, 0.61);  // d15N  herring
+//  dN_g[8] ~ normal(14.75, 0.36);  // d15N  KIMU
+//  dN_g[9] ~ normal(15.18, 0.35);  // d15N  MAMU
+//  dN_g[10] ~ normal(12.44, 0.47); // d15N  Neomysis
+//  dN_g[11] ~ normal(13.47, 0.75); // d15N  Pollock
+//  dN_g[12] ~ normal(12.29, 0.42); // d15N  sandlance
+//  dN_g[13] ~ normal(11.19, 0.53); // d15N  Themisto
+//  dN_g[14] ~ normal(9.92, 0.56);  // d15N  Thysanoessa
+//  dN_g[15] ~ normal(11.55, 0.28); // d15N  YOY capelin
+//  dN_g[16] ~ normal(11.53, 0.45); // d15N  YOY herring
+//  dN_g[17] ~ normal(11.67, 0.59); // d15N  YOY pollock
+
+//  tau[1] ~ normal(4.9, 0.2);    //TL BLKI
+//  tau[2] ~ normal(2.2, 0.4);    //TL zoop
+//  tau[3] ~ normal(3.8, 0.1);    //TL capelin
+//  tau[4] ~ normal(2, 0.4);      //TL copepod
+//  tau[5] ~ normal(3.2, 0.4);      //TL Euphausia
+//  tau[6] ~ normal(4.3, 0.1);      //TL eulachon
+//  tau[7] ~ normal(3.9, 0.2);      //TL herring
+//  tau[8] ~ normal(4.3, 0.1);      //TL copepod
+//  tau[9] ~ normal(4.4, 0.1);      //TL copepod
+//  tau[10] ~ normal(3.6, 0.1);      //TL copepod
+//  tau[11] ~ normal(3.9, 0.2);      //TL copepod
+//  tau[12] ~ normal(3.5, 0.1);      //TL copepod
+//  tau[13] ~ normal(3.2, 0.2);      //TL copepod
+//  tau[14] ~ normal(2.9, 0.2);      //TL copepod
+//  tau[15] ~ normal(3.3, 0.1);      //TL copepod
+//  tau[16] ~ normal(3.3, 0.1);      //TL copepod
+//  tau[17] ~ normal(3.4, 0.2);      //TL copepod
+  
   dC1 ~ normal(-23.5, 0.8);       // Offshore marine, surface sediment 7 sites GOA, Walinski et al 2009
   dC2 ~ normal(-19.1, 1.2);       // Coastal, measured
   dC3 ~ normal(-26.4, 1.47);      // Freshwater POM (Geary 1988 p 80)
-  //dN[1] ~ normal(3.6, 0.2);       // offshore marine SPOM (Wu et al 1997, p 298)
+  //dN[1] ~ normal(3.6, 0.2);     // offshore marine SPOM (Wu et al 1997, p 298)
   dN[1] ~ normal(3.6, 0.7);       // offshore marine surface sediment GOA Walinski et al 2009
   dN[2] ~ normal(3.1, 0.6);       // coastal, measured POM
   dN[3] ~ normal(4.4, 3.9);       // freshwater, measured POM 
-  dH[1] ~ normal(-7.4, 1.0);      // Marine, measured
+  //dH[1] ~ normal(-7.4, 1.0);    // Marine, measured
+  dH[1] ~ normal(-7.4,10);        // Marine, measured *10SD
   dH[2] ~ normal(-15, 20);        // coastal, measured
   dH[3] ~ normal(-113.0, 10.9);   // freshwater, measured
-  //Delta_C[M] ~ normal(0.4, 1.3);     // 13C fractionation per trophic level (Post 2002)
-  Delta_C[M] ~ uniform(0, 1);
+  Delta_C[M] ~ normal(0.4, 1.3);  // 13C fractionation per trophic level (Post 2002)
+  //Delta_C[M] ~ uniform(0, 1);
   Delta_N[1] ~ normal(3.0, 0.9);  //bird.liver
   Delta_N[2] ~ normal(2.2, 0.7);  //bird.blood
   Delta_N[3] ~ normal(3.2, 1.9);  //fish
