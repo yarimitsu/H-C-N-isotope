@@ -6,7 +6,7 @@ dat$Species <- factor(dat$Species, levels = c("BLKI","Bulk Zoop", "Capelin", "Co
 # fit <- fit_sim
 trace <- extract(fit)
 names(trace)
-post_in <- data.frame(dC1 = trace$dC1, dC2 = trace$dC2,dC3 = trace$dC3,dN = trace$dN, dH = trace$dH,
+post_in <- data.frame(dC1 = trace$dC1, dC2 = trace$dC2,dC3 = trace$dC3, dN = trace$dN, dH = trace$dH,
                       Delta_C = trace$Delta_C, Delta_N = trace$Delta_N, Delta_H = trace$Delta_H,frac_H_blki = trace$fblki,
                       omega = trace$omega, tau = trace$tau, phi = trace$phi, sigma_fblki = trace$sigma_fblki,
                       sigma_frc = trace$sigma_frc, sigma_frcH = trace$sigma_frcH,
@@ -250,8 +250,8 @@ pri <- c(function(x){ dnorm(x, -23.5, 0.8) },      # dC.1 marine
          function(x){ dnorm(x, -15.3, 3.6) },      # dH.2 coastal
          function(x){ dnorm(x, -113.0, 10.9) },    # dH.3 freshwater
 #          replicate(M, function(x){ dnorm(x, 0.4, 1.3) }),  # Delta_C
-         replicate(M, function(x){ dunif(x, 0, 1) }),  # Delta_C
-         #function(x){ dnorm(x, 0.4, 1.3) },      # Delta_C
+         #replicate(M, function(x){ dunif(x, 0, 1) }),  # Delta_C
+         function(x){ dnorm(x, 0.4, 1.3) },      # Delta_C
          function(x){ dnorm(x, 3.0, 0.9) },      # Delta_N   
          function(x){ dnorm(x, 2.2, 0.7) },      # Delta_N
          function(x){ dnorm(x, 3.2, 1.9) },      # Delta_N

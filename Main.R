@@ -18,7 +18,7 @@ dH_obs <- as.vector(dat$d2H)
 dC_obs <- as.vector(dat$d13C)
 dN_obs <- as.vector(dat$d15N)
 dH_w <- dat$d2H_w
-tau <- dat$TL
+# tau <- dat$TL
 sp <- factor(dat$Species, ordered = TRUE)
 taxa <- c(1, 5, 3, 5, 4, 3, 3, 2, 2, 4, 3, 3, 4, 4, 6, 6, 6) #taxa-tissue type for each species group
 grp <- as.numeric(sp)
@@ -28,8 +28,8 @@ N <- nrow(dat)
 J <- length(unique(grp))
 K <- 3 # number of sources
 M <- length(unique(taxa))
-tau_g <- ddply(dat, "Species",summarize, mean = mean(TL) )
-tau_gsd <- ddply(dat, "Species",summarize, sd = sd(TL) )
+# tau_g <- ddply(dat, "Species",summarize, mean = mean(TL) )
+# tau_gsd <- ddply(dat, "Species",summarize, sd = sd(TL) )
 #tau_g <- aggregate(tau, by = list(grp), FUN = mean)[2]
 #tau_g <- as.numeric(tau_g[1:J, 1]) - 1
 #dN_g <- aggregate(dN_obs, by = list(grp), FUN = mean)[2]
@@ -64,10 +64,12 @@ isotope_dat <- list(N = N, J = J, K = K, M = M, grp = grp,
 #                           sigma_frcH = 1,
 #                           sigma_omega = rep(0.5, J), sigma_fblki = 1.0))
 
-isotope_init <- list(list(dC1 = -23.5, dC2 = -19.0,  dC3 = -25.0,
+isotope_init <- list(list(dN_g = c(15.9, 7.5, 13.2, 7.0, 11.1, 14.8, 13.4, 14.8, 15.2, 12.4, 13.5, 12.3, 11.2, 9.9, 11.6, 11.5, 11.7),
+                          dC1 = -23.5, dC2 = -19.0,  dC3 = -25.0,
                           dN = c(  3.6,   3.2,    3.5),
                           dH = c( -7.1, -15.0, -115.0),
                           phi = matrix(c(0.3,0.4,0.3), J, K),
+                          phi_fw = 0.3,
                           Delta_C = rep(0.5, M), Delta_N = rep(3.0, M), Delta_H = -163.0,
                           omega = rep(0.23, J), fblki = 70,
                           sigma_src = matrix(rep(0.5, 3), 3, K),
@@ -118,7 +120,7 @@ trace <- extract(fit)
 tau_post_in <- data.frame(tau = trace$tau)
 tau_post <- melt(data.frame(Sample = 1:nrow(tau_post_in), tau_post_in), id.vars = "Sample")
 head(tau_post)
-tau_postmedian <- as.vector(by(tau_post[, "value"], tau_post$variable, median))
+tau_postmedian<- as.vector(by(tau_post[, "value"], tau_post$variable, median))
 tau_postsd <- as.vector(by(tau_post[, "value"], tau_post$variable, sd))
 tau_postm <- as.matrix(cbind(Species = levels(dat$Species), median = round(tau_postmedian,1), sd = round(tau_postsd,2)))
 tau_postm
@@ -130,3 +132,5 @@ phi_postmedian <- as.vector(by(phi_post[, "value"], phi_post$variable, mean))
 phi_postsd <- as.vector(by(phi_post[, "value"], phi_post$variable, sd))
 phi_postm <- as.matrix(cbind(Species = rep(levels(dat$Species)), ID = levels(phi_post$variable), median = round(phi_postmedian,2), sd = round(phi_postsd,2)))
 phi_postm
+
+print(fit)
