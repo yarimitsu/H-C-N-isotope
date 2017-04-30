@@ -249,7 +249,7 @@ pri <- c(function(x){ dnorm(x, -23.5, 0.8) },      # dC.1 marine
          function(x){ dnorm(x, -7.4, 1.0) },       # dH.1 marine
          function(x){ dnorm(x, -15.3, 3.6) },      # dH.2 coastal
          function(x){ dnorm(x, -113.0, 10.9) },    # dH.3 freshwater
-#          replicate(M, function(x){ dnorm(x, 0.4, 1.3) }),  # Delta_C
+         replicate(M, function(x){ dnorm(x, 0.4, 1.3) }),  # Delta_C
          #replicate(M, function(x){ dunif(x, 0, 1) }),  # Delta_C
          function(x){ dnorm(x, 0.4, 1.3) },      # Delta_C
          function(x){ dnorm(x, 3.0, 0.9) },      # Delta_N   
