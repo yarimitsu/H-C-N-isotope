@@ -15,23 +15,13 @@ data {
 }
 transformed data{
   int jj;
-//  vector[J] n_g;
   vector[J] n_w;
-//  vector[J] dN_g;   // data: mean 15N of each group
   vector[J] dH_w;   // covariate: 2H of water
   
   for(i in 1:J) {
-//    n_g[i] <- 0.0;
     n_w[i] <- 0.0;
-//    dN_g[i] <- 0.0;
     dH_w[i] <- 0.0;
   }
-  
-//  for (i in 1:N) {
-//   jj <- grp[i];
-//    n_g[jj] <- n_g[jj] + 1;
-//    dN_g[jj] <- dN_g[jj] + dN_obs[i];
-//  }
 
   for (i in 1:N) {
     jj <- grp[i];
@@ -40,25 +30,23 @@ transformed data{
   }
   
   for (j in 1:J) {
-//    dN_g[j] <- dN_g[j] / n_g[j];
     dH_w[j] <- dH_w[j] / n_w[j];
   }
 
   print("dH_w");
   print(dH_w);
-//  print("dN_g");
-//  print(dN_g);
 }
 
 parameters {
-// real dN_base;                       // 15N of primary consumers
-  real dN_g[J];                       // 15N of consumers by group for tau
+  real dN_base;                        // 15N of primary consumers
+  real dN_g[J];                        // 15N of consumers by group for tau
   ordered[3] dC_ord;                   // carbon sources are ordered vector
   real dN[K];                          // 15N marine, coastal and freshwater sources
   real dH[K];                          // 2H marine, coastal and freshwater sources
   simplex[K] phi[J];                   // phi is defined as a unit simplex and thus are nonnegative and sum(phi)=1
-  real phi_fw;                        // hyperparameter - fw source contribution to food web
-  real<lower=0, upper = 1> Delta_C[M]; // trophic fractionation of C
+//  real phi_fw;                         // hyperparameter - fw source contribution to food web
+//  real<lower=0, upper = 1> Delta_C[M]; // trophic fractionation of C
+  real Delta_C[M];                     // trophic fractionation of C
   real Delta_N[M];                     // trophic fractionation of N
   real Delta_H;                        // trophic fractionation of H
   real<lower=0, upper = 0.7> omega[J]; // proportion of 2H due to ambient water dH_w
@@ -87,21 +75,16 @@ transformed parameters {
   dC2 <- dC_ord[3];
   dC3 <- dC_ord[1];
   
-  for (j in 1:J) {
-   tau[j] <- phi[j][1]*(dN_g[j] - dN[1])/Delta_N[tx[j]] +
-             phi[j][2]*(dN_g[j] - dN[2])/Delta_N[tx[j]] + 
-             phi[j][3]*(dN_g[j] - dN[3])/Delta_N[tx[j]] + 1;
-  }
-  
-//  for (i in 1:N) {
-//  jj <- grp[i]
-//   tau_ind[i] <- phi[jj][1]*(dN_obs[i] - dN[1])/Delta_N[tx[jj]] +
-//             phi[jj][2]*(dN_obs[i] - dN[2])/Delta_N[tx[jj]] + 
-//             phi[jj][3]*(dN_obs[i] - dN[3])/Delta_N[tx[jj]] + 1;
+//  for (j in 1:J) {
+//   tau[j] <- phi[j][1]*(dN_g[j] - dN[1])/Delta_N[tx[j]] +
+//             phi[j][2]*(dN_g[j] - dN[2])/Delta_N[tx[j]] + 
+//            phi[j][3]*(dN_g[j] - dN[3])/Delta_N[tx[j]] + 1;
 //  }
   
   
+  
   for (j in 1:J) {
+    tau[j] <- 2 + (dN_g[j] - dN_base)/Delta_N[tx[j]];
     C_tot[j]  <- Delta_C[tx[j]] * (tau[j]-1);
     N_tot[j]  <- Delta_N[tx[j]] * (tau[j]-1); 
     dC_exp[j] <- (phi[j][1] * (dC1 + C_tot[j])) + 
@@ -152,7 +135,7 @@ model {
   real eps_N;
 
 // Priors
-//  dN_base ~ normal(7.03, 1.38);   // copepod 15N, measured
+  dN_base ~ normal(7.03, 1.38);   // copepod 15N, measured
   dN_g[1] ~ normal(15.91, 0.53);  // d15N BLKI
   dN_g[2] ~ normal(7.55, 1.22);   // d15N  Bulk Zoop
   dN_g[3] ~ normal(13.23, 0.41);  // d15N  Capelin
@@ -182,7 +165,7 @@ model {
   dH[1] ~ normal(-7.4,10);        // Marine, measured *10SD
   dH[2] ~ normal(-15.3, 20);        // coastal, measured
   dH[3] ~ normal(-113.0, 10.9);   // freshwater, measured
-  phi_fw ~ normal(phi[3], sigma_src[3][K]); //freshwater contribution to food web
+  //phi_fw ~ normal(phi[3], sigma_src[3][K]); //freshwater contribution to food web
   Delta_C[M] ~ normal(0.4, 1.3);  // 13C fractionation per trophic level (Post 2002)
   //Delta_C[M] ~ uniform(0, 1);
   Delta_N[1] ~ normal(3.0, 0.9);  //bird.liver

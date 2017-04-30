@@ -65,11 +65,12 @@ isotope_dat <- list(N = N, J = J, K = K, M = M, grp = grp,
 #                           sigma_omega = rep(0.5, J), sigma_fblki = 1.0))
 
 isotope_init <- list(list(dN_g = c(15.9, 7.5, 13.2, 7.0, 11.1, 14.8, 13.4, 14.8, 15.2, 12.4, 13.5, 12.3, 11.2, 9.9, 11.6, 11.5, 11.7),
+                          dN_base = 7,
                           dC1 = -23.5, dC2 = -19.0,  dC3 = -25.0,
                           dN = c(  3.6,   3.2,    3.5),
                           dH = c( -7.1, -15.0, -115.0),
                           phi = matrix(c(0.3,0.4,0.3), J, K),
-                          phi_fw = 0.3,
+                          #phi_fw = 0.3,
                           Delta_C = rep(0.5, M), Delta_N = rep(3.0, M), Delta_H = -163.0,
                           omega = rep(0.23, J), fblki = 70,
                           sigma_src = matrix(rep(0.5, 3), 3, K),
@@ -81,9 +82,9 @@ isotope_init <- list(list(dN_g = c(15.9, 7.5, 13.2, 7.0, 11.1, 14.8, 13.4, 14.8,
 # STAN model
 mod <- stan_model(file = 'isotope7.stan')
 # Run MCMC
-warmup <- 1e5
-iter <- 1e6
-thin <- 900
+warmup <- 1e3
+iter <- 1e4
+thin <- 9
 cat((iter-warmup)/thin, "samples will be saved\n")
 fit <- sampling(object = mod, data = isotope_dat, init = isotope_init,
                 warmup = warmup, iter = iter, thin = thin, chains = 1)
