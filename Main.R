@@ -6,6 +6,7 @@ library(rstan)
 library(reshape2)
 library(ggplot2)
 library(plyr)
+library(png)
 
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
@@ -14,6 +15,9 @@ options(mc.cores = parallel::detectCores())
 # DATA
 # =====================================================================#
 dat <- read.csv("data/glacier_iso.csv", header = TRUE)
+levels(dat$Species)
+levels(dat$Taxa)
+head(dat)
 dH_obs <- as.vector(dat$d2H)
 dC_obs <- as.vector(dat$d13C)
 dN_obs <- as.vector(dat$d15N)
@@ -82,9 +86,9 @@ isotope_init <- list(list(dN_g = c(15.9, 7.5, 13.2, 7.0, 11.1, 14.8, 13.4, 14.8,
 # STAN model
 mod <- stan_model(file = 'isotope7.stan')
 # Run MCMC
-warmup <- 1e3
-iter <- 1e4
-thin <- 9
+warmup <- 1e4
+iter <- 1e5
+thin <- 90
 cat((iter-warmup)/thin, "samples will be saved\n")
 fit <- sampling(object = mod, data = isotope_dat, init = isotope_init,
                 warmup = warmup, iter = iter, thin = thin, chains = 1)
@@ -125,6 +129,15 @@ tau_postmedian<- as.vector(by(tau_post[, "value"], tau_post$variable, median))
 tau_postsd <- as.vector(by(tau_post[, "value"], tau_post$variable, sd))
 tau_postm <- as.matrix(cbind(Species = levels(dat$Species), median = round(tau_postmedian,1), sd = round(tau_postsd,2)))
 tau_postm
+
+dN_g_post_in <- data.frame(dN_g = trace$dN_g)
+dN_g_post <- melt(data.frame(Sample = 1:nrow(dN_g_post_in), dN_g_post_in), id.vars = "Sample")
+head(dN_g_post)
+dN_g_postmedian<- as.vector(by(dN_g_post[, "value"], dN_g_post$variable, median))
+dN_g_postsd <- as.vector(by(dN_g_post[, "value"], dN_g_post$variable, sd))
+dN_g_postm <- as.matrix(cbind(Species = levels(dat$Species), median = round(dN_g_postmedian,1), sd = round(dN_g_postsd,2)))
+dN_g_postm
+
 
 phi_post_in <- data.frame(phi = trace$phi)
 phi_post <- melt(data.frame(Sample = 1:nrow(phi_post_in), phi_post_in), id.vars = "Sample")

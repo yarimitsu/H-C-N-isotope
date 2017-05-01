@@ -1,20 +1,20 @@
 dat$Species <- factor(dat$Species, levels = c("BLKI","Bulk Zoop", "Capelin", "Copepod", "E. pacifica",  "Eulachon",  "Herring", "KIMU", "MAMU", "Neomysis", "Pollock", "Sandlance", "T. libellula", "Thysanoessa", "YOY Capelin", "YOY Herring", "YOY Pollock"))
-
+dat$Taxa <- factor(dat$Taxa, levels = c("bird liver", "bird blood", "fish", "macroz", "microz", "YOY fish"))
 #=============================================================================#
 # Extract posteriors from the STAN MCMC
 #=============================================================================#
 # fit <- fit_sim
 trace <- extract(fit)
 names(trace)
-post_in <- data.frame(dC1 = trace$dC1, dC2 = trace$dC2,dC3 = trace$dC3, dN = trace$dN, dH = trace$dH,
+post_in <- data.frame(dC1 = trace$dC1, dC2 = trace$dC2,dC3 = trace$dC3, dN = trace$dN, dH = trace$dH, dN_g = trace$dN_g,
                       Delta_C = trace$Delta_C, Delta_N = trace$Delta_N, Delta_H = trace$Delta_H,frac_H_blki = trace$fblki,
                       omega = trace$omega, tau = trace$tau, phi = trace$phi, sigma_fblki = trace$sigma_fblki,
                       sigma_frc = trace$sigma_frc, sigma_frcH = trace$sigma_frcH,
                       sigma_src = trace$sigma_src,
                       lp = trace$lp__)
 post <- melt(data.frame(Sample = 1:nrow(post_in), post_in), id.vars = "Sample")
-head(post_in)
-names(post_in)
+#head(post_in)
+#names(post_in)
 post$Source <- NA
 post$Species <- NA
 for (i in 1:J)
@@ -25,6 +25,7 @@ for (i in 1:J)
     post$Species[post$variable %in% paste0("phi.",i,".1")] <- levels(factor(dat$Species, ordered = TRUE))[i]
     post$Species[post$variable %in% paste0("phi.",i,".2")] <- levels(factor(dat$Species, ordered = TRUE))[i]
     post$Species[post$variable %in% paste0("phi.",i,".3")] <- levels(factor(dat$Species, ordered = TRUE))[i]
+    post$Species[post$variable %in% paste0("dN_g.",i)] <- levels(factor(dat$Species, ordered = TRUE))[i]
     post$Species[post$variable %in% paste0("omega.",i)] <- levels(factor(dat$Species, ordered = TRUE))[i]
     post$Species[post$variable %in% paste0("tau.",i)] <- levels(factor(dat$Species, ordered = TRUE))[i]
     post$Species[post$variable %in% paste0("sigma_frc.1.",i)] <- levels(factor(dat$Species, ordered = TRUE))[i]
@@ -126,7 +127,9 @@ dH_adj_postmean <- as.vector(by(post3[, "value"], post3$variable, mean))
 
 i <- grepl("phi", post$variable)
 d1 <- post[i,]
+head(d1)
 d1$Species <- factor(d1$Species, levels = c("Bulk Zoop", "Copepod", "E. pacifica", "Thysanoessa", "T. libellula", "Neomysis", "YOY Capelin", "YOY Herring", "YOY Pollock", "Eulachon", "Capelin", "Herring", "Sandlance", "Pollock", "KIMU", "MAMU", "BLKI"))
+
 p <- ggplot(data = d1) + 
   facet_wrap(Species ~ Source, scales = "free_y", ncol = 6) + 
   geom_line(aes(Sample, value)) + 
@@ -154,17 +157,29 @@ post$Labs[post$variable %in%  "sigma_src.2.3"] <- "Sigma Freshwater Nitrogen"
 post$Labs[post$variable %in%  "sigma_src.3.1"] <- "Sigma Offshore Hydrogen"
 post$Labs[post$variable %in%  "sigma_src.3.2"] <- "Sigma Coastal Hydrogen"
 post$Labs[post$variable %in%  "sigma_src.3.3"] <- "Sigma Freshwater Hydrogen"
+post$Labs [post$variable %in%  "Delta_N.1"] <- "bird liver" 
+post$Labs [post$variable %in%  "Delta_N.2"] <- "bird blood"
+post$Labs [post$variable %in%  "Delta_N.3"] <- "fish"
+post$Labs [post$variable %in%  "Delta_N.4"] <- "macroz"
+post$Labs [post$variable %in%  "Delta_N.5"] <- "microz"
+post$Labs [post$variable %in%  "Delta_N.6"] <- "YOY fish"
+post$Labs [post$variable %in%  "Delta_C.1"] <- "bird liver" 
+post$Labs [post$variable %in%  "Delta_C.2"] <- "bird blood"
+post$Labs [post$variable %in%  "Delta_C.3"] <- "fish"
+post$Labs [post$variable %in%  "Delta_C.4"] <- "macroz"
+post$Labs [post$variable %in%  "Delta_C.5"] <- "microz"
+post$Labs [post$variable %in%  "Delta_C.6"] <- "YOY fish"
 
 for (i in 1:J) {
 post$Labs[post$variable %in% paste0("tau.",i)] <- levels(factor(dat$Species, ordered = TRUE))[i]
 }
 
-for (i in 1:M) {
-post$Labs[post$variable %in%  paste0("Delta_C.",i)] <- levels(factor(dat$Taxa, ordered = TRUE))[i]
-post$Labs[post$variable %in%  paste0("Delta_N.",i)] <- levels(factor(dat$Taxa, ordered = TRUE))[i]
-}
+# for (i in 1:M) {
+# post$Labs[post$variable %in%  paste0("Delta_C.",i)] <- levels(factor(dat$Taxa, ordered = TRUE))[i]
+# post$Labs[post$variable %in%  paste0("Delta_N.",i)] <- levels(factor(dat$Taxa, ordered = TRUE))[i]
+# }
 
-#post$Labs[post$variable %in%  "Delta_C"] <- "Delta C"
+#post$Labs[post$variable %in%  paste0("Delta_C")] <- "Delta C"
 
 post$Labs[post$variable %in%  "Delta_H"] <- "Delta H"
 
@@ -172,7 +187,7 @@ post$Labs[post$variable %in%  "fblki"] <- "f BLKI"
 # post$Labs <- factor(post$Labs, levels = c("Offshore Carbon","Coastal Carbon", "Freshwater Carbon", "Offshore Nitrogen", "Coastal Nitrogen", "Freshwater Nitrogen" , "Offshore Hydrogen", "Coastal Hydrogen", "Freshwater Hydrogen",
 #                                          "Sigma Offshore Carbon","Sigma Coastal Carbon", "Sigma Freshwater Carbon", "Sigma Offshore Nitrogen", "Sigma Coastal Nitrogen", "Sigma Freshwater Nitrogen" , "Sigma Offshore Hydrogen", "Sigma Coastal Hydrogen", "Sigma Freshwater Hydrogen", "Delta C", "Delta N", "Delta H", "f BLKI"))
 
-i <- grepl("dC", post$variable) | grepl("dN", post$variable) | grepl("dH", post$variable) | grepl("sigma_src", post$variable)
+i <- grepl("dC", post$variable) | grepl("dN.", post$variable) | grepl("dH", post$variable) | grepl("sigma_src", post$variable)
 d1 <- post[i,]
 head(d1)
 p <- ggplot(data = d1) +
@@ -228,11 +243,14 @@ png("figs/mcmc_par_trace_omega.png", width = 8, height = 6, units = "in", res = 
 plot(p)
 dev.off()
 
+
 #=============================================================================#
 # MCMC histograms
 #=============================================================================#
 # Find the range of each of the variables for plotting priors
 rng <- apply(post_in, 2, range)
+head(post_in)
+names(post_in)
 # Create a different data frame for plotting the priors
 xx <- apply(rng, 2, function(x) seq(x[1], x[2], length.out = 1000))
 dp <- xx
@@ -249,16 +267,32 @@ pri <- c(function(x){ dnorm(x, -23.5, 0.8) },      # dC.1 marine
          function(x){ dnorm(x, -7.4, 1.0) },       # dH.1 marine
          function(x){ dnorm(x, -15.3, 3.6) },      # dH.2 coastal
          function(x){ dnorm(x, -113.0, 10.9) },    # dH.3 freshwater
+         function(x){ dnorm(x, 15.91, 0.53) },    # dN_g BLKI
+         function(x){ dnorm(x, 7.55, 1.22) },     # dN_g Bulk Zoop
+         function(x){ dnorm(x, 13.23, 0.41) },    # dN_g capelin
+         function(x){ dnorm(x, 7.03, 01.38) },    # dN_g copepod
+         function(x){ dnorm(x, 11.07, 1.21) },    # dN_g Euphausia
+         function(x){ dnorm(x, 14.75, 0.37) },    # dN_g Eulachon
+         function(x){ dnorm(x, 13.44, 0.61) },    # dN_g herring
+         function(x){ dnorm(x, 14.75, 0.36) },    # dN_g KIMU
+         function(x){ dnorm(x, 15.18, 0.35) },    # dN_g MAMU
+         function(x){ dnorm(x, 12.44, 0.47) },    # dN_g Neomysis
+         function(x){ dnorm(x, 13.47, 0.75) },    # dN_g pollock
+         function(x){ dnorm(x, 12.29, 0.42) },    # dN_g sandlance
+         function(x){ dnorm(x, 11.19, 0.53) },    # dN_g themisto
+         function(x){ dnorm(x, 9.92, 0.56) },     # Thysanoessa
+         function(x){ dnorm(x, 11.55, 0.28) },    # dN_g YOYcapelin
+         function(x){ dnorm(x, 11.53, 0.45) },    # dN_g herring
+         function(x){ dnorm(x, 11.67, 0.59) },    # dN_g pollock
          replicate(M, function(x){ dnorm(x, 0.4, 1.3) }),  # Delta_C
          #replicate(M, function(x){ dunif(x, 0, 1) }),  # Delta_C
-         function(x){ dnorm(x, 0.4, 1.3) },      # Delta_C
-         function(x){ dnorm(x, 3.0, 0.9) },      # Delta_N   
-         function(x){ dnorm(x, 2.2, 0.7) },      # Delta_N
-         function(x){ dnorm(x, 3.2, 1.9) },      # Delta_N
-         function(x){ dnorm(x, 2.3, 0.9) },      # Delta_N
-         function(x){ dnorm(x, 2.3, 0.9) },     # Delta_N
-         function(x){ dnorm(x, 2.2, 1.1) },      # Delta_N
-         function(x){ dnorm(x, -163.7, 27.0) },   # Delta_H
+         function(x){ dnorm(x, 3.0, 0.9) },       # Delta_N   
+         function(x){ dnorm(x, 2.2, 0.7) },       # Delta_N
+         function(x){ dnorm(x, 3.2, 1.9) },       # Delta_N
+         function(x){ dnorm(x, 2.3, 0.9) },       # Delta_N
+         function(x){ dnorm(x, 2.3, 0.9) },       # Delta_N
+         function(x){ dnorm(x, 2.2, 1.1) },       # Delta_N
+         function(x){ dnorm(x, -163.7, 27.0) },    # Delta_H
          function(x){ dunif(x, 30, 150) },         # fblki
          function(x){ dnorm(x, blki_omega, 0.05) },# omega BLKI 
          function(x){ dnorm(x, 0.23, 0.03) },      # omega Bulk zoop
@@ -323,6 +357,8 @@ for (i in 1:J)
   dp$Species[dp$variable %in% paste0("sigma_frc.2.",i)] <- levels(factor(dat$Species, ordered = TRUE))[i]
   dp$Species[dp$variable %in%  paste0("sigma_frc.1", i)] <- levels(factor(dat$Species, ordered = TRUE))[i]
   dp$Species[dp$variable %in%  paste0("sigma_frc.2", i)] <- levels(factor(dat$Species, ordered = TRUE))[i]
+  dp$Species[dp$variable %in%  paste0("dN_g.", i)] <- levels(factor(dat$Species, ordered = TRUE))[i]
+  
 }
 
 for (i in 1:3){
@@ -333,6 +369,20 @@ for (i in 1:3){
   dp$Isotope[dp$variable %in%  paste0("sigma_src.2.", i)] <- "Nitrogen"
   dp$Isotope[dp$variable %in%  paste0("sigma_src.3.", i)] <- "Hydrogen"
 }
+
+dp$Labs [dp$variable %in%  "Delta_N.1"] <- "bird liver" 
+dp$Labs [dp$variable %in%  "Delta_N.2"] <- "bird blood"
+dp$Labs [dp$variable %in%  "Delta_N.3"] <- "fish"
+dp$Labs [dp$variable %in%  "Delta_N.4"] <- "macroz"
+dp$Labs [dp$variable %in%  "Delta_N.5"] <- "microz"
+dp$Labs [dp$variable %in%  "Delta_N.6"] <- "YOY fish"
+dp$Labs [dp$variable %in%  "Delta_C.1"] <- "bird liver" 
+dp$Labs [dp$variable %in%  "Delta_C.2"] <- "bird blood"
+dp$Labs [dp$variable %in%  "Delta_C.3"] <- "fish"
+dp$Labs [dp$variable %in%  "Delta_C.4"] <- "macroz"
+dp$Labs [dp$variable %in%  "Delta_C.5"] <- "microz"
+dp$Labs [dp$variable %in%  "Delta_C.6"] <- "YOY fish"
+
 
 i <- grepl("phi", post$variable)
 d1 <- post[i,]
@@ -360,11 +410,11 @@ png("figs/mcmc_par_density_phis.png", width = 10, height = 5, units = "in", res 
 plot(p)
 dev.off()
 
-i <- grepl("dC", post$variable) | grepl("dN", post$variable) | grepl("dH", post$variable) | grepl("sigma_src", post$variable)
+i <- grepl("dC", post$variable) | grepl("dN.", post$variable) | grepl("dH", post$variable) | grepl("sigma_src", post$variable)
 d1 <- post[i,]
 head(d1)
 
-k <- grepl("dC", post$variable) | grepl("dN", post$variable) | grepl("dH", post$variable) | grepl("sigma_src", dp$variable)
+k <- grepl("dC", post$variable) | grepl("dN.", post$variable) | grepl("dH", post$variable) | grepl("sigma_src", dp$variable)
 dp2 <- dp[k,]
 dp2$Labs <- NA
 dp2$Labs[dp2$variable %in%  "dC1"] <- "Offshore Carbon"
@@ -397,12 +447,12 @@ png("figs/mcmc_par_hist_source.png", width = 8, height = 8, units = "in", res = 
 plot(p)
 dev.off()
 
-i <- grepl("dC", post$variable) | grepl("dN", post$variable) | grepl("dH", post$variable)# | grepl("Delta", post$variable)
+i <- grepl("dC", post$variable) | grepl("dN.", post$variable, fixed = TRUE) | grepl("dH", post$variable)# | grepl("Delta", post$variable)
 d1 <- post[i,]
 p <- ggplot(d1, aes(value)) +
     facet_wrap(~Labs, scales = "free", ncol = 3) +
     geom_histogram(aes(y = ..density..)) + ylab("Probability Density\n") + xlab(expression(paste("\nIsotope Ratio (\u2030)")))
-j <- grepl("dC", dp$variable) | grepl("dN", dp$variable) | grepl("dH", dp$variable)#| grepl("Delta", dp$variable)
+j <- grepl("dC", dp$variable) | grepl("dN.", dp$variable) | grepl("dH", dp$variable)#| grepl("Delta", dp$variable)
 dp1 <- dp[i,]
 head(dp1)
 dp1$Labs <- NA
@@ -424,8 +474,27 @@ png("figs/mcmc_par_hist_source.png", width = 8, height = 6, units = "in", res = 
 plot(p)
 dev.off()
 
+i <- grepl("dN_g", post$variable)
+d1 <- post[i,]
+head(d1)
+d1$Species <- factor(d1$Species, levels = c("Bulk Zoop", "Copepod", "E. pacifica", "Thysanoessa", "T. libellula", "Neomysis", "YOY Capelin", "YOY Herring", "YOY Pollock", "Eulachon", "Capelin", "Herring", "Sandlance", "Pollock", "KIMU", "MAMU", "BLKI"))
+# d1$Labs <- factor(d1$Labs, levels = c("bird liver", "bird blood", "fish", "macroz", "microz", "YOY fish"))
+
+p <- ggplot(d1, aes(x = value)) +
+  facet_wrap(~Species, scales = "free", ncol = 4) + xlab("\ndN_g") + ylab("Probability Density\n") +
+  geom_histogram(aes(y = ..density..))
+j <- grepl("dN_g", dp$variable)
+dp1 <- dp[j,]
+head(dp1)
+dp1$Species <- factor(dp1$Species, levels = c("Bulk Zoop", "Copepod", "E. pacifica", "Thysanoessa", "T. libellula", "Neomysis", "YOY Capelin", "YOY Herring", "YOY Pollock", "Eulachon", "Capelin", "Herring", "Sandlance", "Pollock", "KIMU", "MAMU", "BLKI"))
+p <- p + geom_line(data = dp1, aes(x = x, y = value1), color = "red")
+png("figs/mcmc_par_hist_dN_g.png", width = 8, height = 6, units = "in", res = 300)
+plot(p)
+dev.off()
+
 i <- grepl("Delta_C", post$variable)
 d1 <- post[i,]
+head(d1)
 p <- ggplot(d1, aes(value)) +
   facet_wrap(~Labs, scales = "free", ncol = 3) +
   geom_histogram(aes(y = ..density..)) + ylab("Probability Density\n") + xlab(expression(paste("\nDelta C (\u2030)")))
